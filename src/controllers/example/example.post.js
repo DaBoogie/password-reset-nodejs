@@ -3,10 +3,10 @@ const errors = require('../../errors');
 const authenticate = require('../../middleware/authenticate');
 /**
  *  @swagger
- *  /v1/report/filter:
+ *  /v1/example:
  *    post:
  *      tags:
- *        - examples
+ *        - example
  *      description: save report
  *      parameters:
  *        - name: name

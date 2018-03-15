@@ -3,10 +3,10 @@ const errors = require('../../errors');
 const router = require('express').Router();
 /**
  *  @swagger
- *  /v1/report/filters:
+ *  /v1/example:
  *    get:
  *      tags:
- *        - reports
+ *        - example
  *      description: get list of examples
  *      responses:
  *        200:
