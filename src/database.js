@@ -1,17 +1,14 @@
 'use strict';
 
 const debug = require('debug')('lg:database');
-const dbConfig = require('config').get('pg');
+const dbConfig = require('config').get('db');
 const Sequelize = require('sequelize');
 const path = require('path');
 const klawSync = require('klaw-sync');
 
 debug(`Database connection string: ${dbConfig.uri}`);
 const sequelize = new Sequelize(dbConfig.uri, {
-    dialect: 'postgres',
-    dialectOptions: {
-      multipleStatements: true,
-    },
+    dialect: 'mysql',
     logging: dbConfig.logging ? debug : false,
 });
 

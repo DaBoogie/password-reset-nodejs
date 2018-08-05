@@ -1,33 +1,21 @@
 require('dotenv').load({path: process.env.DOTENV || '.env'});
 
 const express = require('express');
-const cron = require('cron');
 const cors = require('cors');
-const fs = require('fs');
 const path = require('path');
 const bodyParser = require('body-parser');
 const klawSync = require('klaw-sync');
 const config = require('config');
 const database = require('./database');
 const app = express();
-// heroku watchdog
-const http = require('http');
-
-jobs = {};
 const root = __dirname;
-const pathToJobs = root + '/jobs';
 
 /* globals */
-models = require('./database').models;
-
 app.set('models', database.models);
 app.set('sequelize', database.sequelize);
 
 /* configure logger */
 configureLogger();
-
-app.use(express.static(path.join(root, '../client/www/dist')));
-
 
 /* set CORS */
 app.use(cors({origin: '*'}));
@@ -40,9 +28,7 @@ app.use((req, res, next) => {
     next();
 });
 
-useControllers()
-    .then(init())
-    .then(startJobs());
+useControllers();
 
 app.use((err, req, res, next) => {
     console.error(err);
@@ -66,33 +52,8 @@ async function useControllers() {
         app.use('/', require(file.path));
         controllersCount++;
     });
-
     console.info(`Total controllers: ${controllersCount}`);
-};
-
-async function init() {
-    const uploadsDir = './uploads';
-    if (!fs.existsSync(uploadsDir)) {
-        fs.mkdir(uploadsDir);
-    }
 }
-
-async function startJobs() {
-    let counter = 0;
-    const paths = await klawSync(pathToJobs, {nodir: true});
-    paths.forEach((file) => {
-        const jobConfig = require(file.path);
-        const jobName = path.basename(file.path, '.js');
-        const job = new cron.CronJob(jobConfig);
-        if (config.app.autoJobs && !config.app.skipJobs.includes(jobName)) {
-            console.log(`Job ${jobName} started.`);
-            job.start();
-            counter++;
-        }
-        jobs[jobName] = jobConfig.onTick;
-    });
-    console.info(`Jobs started: ${counter}`);
-};
 
 function configureLogger() {
     process.on('uncaughtException', function (err) {
@@ -105,7 +66,7 @@ function configureLogger() {
         console.error('unhandledRejection', reason);
     });
     console.info(`Logging settings: ${process.env.DEBUG}`);
-};
+}
 
 app.listen(config.app.port, '0.0.0.0', async function () {
         console.info(`${new Date()}: Server listening on port: ${config.app.port}`);

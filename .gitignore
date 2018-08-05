@@ -5,7 +5,6 @@ sequelize-config.json
 /node_modules
 
 # files from email
-/uploads
 
 # Configuration files
 *.env
